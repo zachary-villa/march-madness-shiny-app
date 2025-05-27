@@ -1,0 +1,78 @@
+# Loading packages
+```{r}
+library(tidyverse)
+library(dplyr)
+library(tidyr)
+```
+
+# Loading dataset
+```{r}
+team_statistics <- read.csv("cbb.csv")
+```
+
+# Previewing dataset
+```{r}
+head(team_statistics)
+```
+
+# Getting rid of BARTHAG variable 
+```{r}
+team_statistics$BARTHAG <- NULL 
+```
+
+# Defining the variable SEED as an integer
+```{r}
+team_statistics$SEED <- as.integer(team_statistics$SEED)
+```
+
+# Renaming the placements of the POSTSEASON variable 
+```{r}
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "Champions", "Champion")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "2ND", "Runner-up")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "F4", "Final Four")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "E8", "Elite Eight")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "S16", "Sweet Sixteen")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "R32", "Second Round")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "R64", "First Round")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "R68", "First Four")
+team_statistics$POSTSEASON <- replace(team_statistics$POSTSEASON, team_statistics$POSTSEASON  == "N/A", NA)
+```
+
+# Filtering dataset down to only teams that made the tournament 
+```{r}
+team_statistics <- filter(team_statistics, !is.na(POSTSEASON))
+```
+
+# Creating L variable
+```{r}
+team_statistics <- mutate(team_statistics, L = G - W)
+```
+
+# Creating RECORD variable
+```{r}
+team_statistics <- mutate(team_statistics, RECORD = paste(W, "-", L))
+
+```
+
+# Creating WINPCT variable 
+```{r}
+team_statistics <- mutate(team_statistics, WINPCT = W / G)
+team_statistics <- mutate(team_statistics, WINPCT = round(WINPCT, 3))
+```
+
+# Reordering columns 
+```{r}
+team_statistics <- relocate(team_statistics, L, .after = W)
+team_statistics <- relocate(team_statistics, RECORD, .after = G)
+team_statistics <- relocate(team_statistics, WINPCT, .after = L)
+```
+
+# Arranging columns by TEAM and YEAR
+```{r}
+team_statistics <- arrange(team_statistics, YEAR, TEAM)
+```
+
+# Viewing final table 
+```{r}
+view(team_statistics)
+```
